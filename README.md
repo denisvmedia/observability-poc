@@ -59,6 +59,28 @@ Six metrics are computed per version from the raw session rows:
 - Session count < 100 (low statistical confidence)
 - Session count = 0 (no data)
 
+## Troubleshooting
+
+**macOS: "cannot be opened because the developer cannot be verified"**
+
+Binaries built locally are unsigned, so Gatekeeper blocks them. To remove the quarantine flag:
+
+```
+xattr -d com.apple.quarantine ./bin/observability
+```
+
+If that doesn't help (e.g. the attribute isn't there but it still won't run):
+
+```
+sudo spctl --master-disable
+./bin/observability run
+sudo spctl --master-enable
+```
+
+Or right-click the binary in Finder → Open → Open anyway.
+
+More details: https://donatstudios.com/mac-terminal-run-unsigned-binaries
+
 ## Development
 
 ```
