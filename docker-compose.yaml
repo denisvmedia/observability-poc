@@ -1,6 +1,6 @@
 services:
   clickhouse:
-    image: clickhouse/clickhouse-server:25
+    image: clickhouse/clickhouse-server:latest
     restart: unless-stopped
     environment:
       CLICKHOUSE_DB: ${CLICKHOUSE_DB:-observability}
@@ -22,7 +22,7 @@ services:
       start_period: 30s
 
   init-schema:
-    image: clickhouse/clickhouse-server:25
+    image: clickhouse/clickhouse-server:latest
     depends_on:
       clickhouse:
         condition: service_healthy
