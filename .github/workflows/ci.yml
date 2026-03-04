@@ -1,0 +1,156 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  go-test:
+    name: Go Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go/go.mod
+          cache: true
+          cache-dependency-path: go/go.sum
+      - name: Download Go dependencies
+        run: go mod download
+        working-directory: go
+      - name: Run Go tests
+        run: go test -v -race ./...
+        working-directory: go
+
+  go-lint:
+    name: Go Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go/go.mod
+          cache: true
+          cache-dependency-path: go/go.sum
+      - name: nolintguard
+        run: go run github.com/go-extras/nolintguard/cmd/nolintguard@latest ./...
+        working-directory: go
+      - name: qtlint
+        run: go run github.com/go-extras/qtlint/cmd/qtlint@latest ./...
+        working-directory: go
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          args: --timeout=30m
+          working-directory: go
+
+  frontend-test:
+    name: Frontend Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+      - name: Run frontend tests
+        run: npm run test
+        working-directory: frontend
+
+  frontend-lint:
+    name: Frontend Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+      - name: Run frontend lint
+        run: npm run lint
+        working-directory: frontend
+
+  go-mod-tidy:
+    name: Go Mod Tidy Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go/go.mod
+          cache: true
+          cache-dependency-path: go/go.sum
+      - name: Ensure go mod tidy has no changes
+        run: |
+          cd go
+          go mod tidy
+          cd ../frontend
+          go mod tidy
+          cd ..
+          if ! git diff --exit-code; then
+            echo "go mod tidy produced changes. Please run go mod tidy locally and commit the result."
+            git --no-pager diff
+            exit 1
+          fi
+
+  goreleaser-build:
+    name: GoReleaser Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go/go.mod
+          cache: true
+          cache-dependency-path: go/go.sum
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+      - name: Download Go dependencies
+        run: go mod download
+        working-directory: go
+      - name: Run GoReleaser (snapshot)
+        uses: goreleaser/goreleaser-action@v7
+        with:
+          version: latest
+          args: release --snapshot --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

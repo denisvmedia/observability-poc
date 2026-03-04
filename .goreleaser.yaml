@@ -1,0 +1,52 @@
+version: 2
+
+project_name: observability-poc
+
+before:
+  hooks:
+    - npm --prefix frontend ci
+    - npm --prefix frontend run build
+
+builds:
+  - binary: observability
+    main: ./cmd/observability
+    dir: go
+    flags:
+      - -tags=with_frontend
+      - -trimpath
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - formats: [ 'tar.gz' ]
+    wrap_in_directory: true
+    format_overrides:
+      - goos: windows
+        formats: [ 'zip' ]
+    name_template: '{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+
+snapshot:
+  version_template: SNAPSHOT-{{ .Commit }}
+
+checksum:
+  disable: false
+  name_template: '{{ .ProjectName }}-{{ .Version }}-checksums.txt'
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+      - '^build:'
+      - Merge pull request
+      - Merge branch
+      - go mod tidy
