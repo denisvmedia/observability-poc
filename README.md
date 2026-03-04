@@ -2,6 +2,8 @@
 
 A small quality-of-experience dashboard for comparing playback session metrics across app versions. Ingests XLSX exports, stores them in ClickHouse, and shows a side-by-side KPI comparison in a Vue 3 frontend.
 
+![Dashboard](.github/screenshots/dashboard.png)
+
 ## Stack
 
 - Go + Chi (API)
@@ -10,7 +12,17 @@ A small quality-of-experience dashboard for comparing playback session metrics a
 
 ## Running
 
-The easiest way is Docker Compose:
+**Pre-built image from ghcr.io:**
+
+```
+docker run -p 8080:8080 \
+  -e OBSERVABILITY_DB_DSN="clickhouse://user:password@host:9000/dbname" \
+  ghcr.io/denisvmedia/observability-poc:latest run
+```
+
+Or with Docker Compose using the pre-built image, set `image: ghcr.io/denisvmedia/observability-poc:latest` instead of the `build` block in `docker-compose.yaml`.
+
+**Build from source:**
 
 ```
 docker compose up --build
