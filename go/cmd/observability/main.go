@@ -3,6 +3,8 @@ package main
 import (
 	"log/slog"
 	"os"
+
+	_ "github.com/denisvmedia/observability-poc/registry/clickhouse"
 )
 
 func main() {

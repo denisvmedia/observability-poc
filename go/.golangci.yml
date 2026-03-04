@@ -96,6 +96,7 @@ linters:
         - generic
         - stdlib
         - (or|er)$
+        - SessionRegistry
     lll:
       line-length: 240
     nakedret: # Discussions on why naked return can be a problem: https://github.com/golang/go/issues/21291
@@ -283,6 +284,9 @@ linters:
       - path: '_test\.go$'
         text: 'unchecked-type-assertion:'
       - path: 'cmd/.*\.go$'
+        linters:
+          - gochecknoinits
+      - path: 'registry/clickhouse/.*\.go$'
         linters:
           - gochecknoinits
       - path: 'cmd/.*\.go$'

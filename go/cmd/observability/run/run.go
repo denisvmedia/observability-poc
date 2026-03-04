@@ -30,7 +30,7 @@ func New() *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&cfg.addr, "addr", ":8080", "Bind address for the server")
-	cmd.Flags().StringVar(&cfg.dbDSN, "db-dsn", "memory://", "Database DSN")
+	cmd.Flags().StringVar(&cfg.dbDSN, "db-dsn", "clickhouse://localhost:9000/observability", "Database DSN (clickhouse://user:pass@host:port/db)")
 
 	return cmd
 }
