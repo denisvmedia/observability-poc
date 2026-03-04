@@ -20,14 +20,14 @@ type PlaybackSession struct {
 
 // VersionKPIs holds aggregated quality metrics for a single app version.
 type VersionKPIs struct {
-	Version        string
-	SessionCount   int64
-	VSFRate        float64
-	VPFRate        float64
-	CIRRRate       float64
-	AvgVST         float64
-	PlayRate       float64
-	CompletionRate float64
+	Version        string  `json:"version"`
+	SessionCount   int64   `json:"session_count"`
+	VSFRate        float64 `json:"vsf_rate"`
+	VPFRate        float64 `json:"vpf_rate"`
+	CIRRRate       float64 `json:"cirr_rate"`
+	AvgVST         float64 `json:"avg_vst"`
+	PlayRate       float64 `json:"play_rate"`
+	CompletionRate float64 `json:"completion_rate"`
 }
 
 // Alert describes a quality issue detected for a specific version.

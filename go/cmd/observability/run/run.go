@@ -10,6 +10,9 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+
+	"github.com/denisvmedia/observability-poc/apiserver"
+	"github.com/denisvmedia/observability-poc/registry"
 )
 
 type config struct {
@@ -38,12 +41,19 @@ func New() *cobra.Command {
 func runServer(cfg *config) error {
 	slog.Info("Starting server", "addr", cfg.addr, "db-dsn", cfg.dbDSN)
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/healthz", healthzHandler)
+	setFunc, ok := registry.GetRegistry(cfg.dbDSN)
+	if !ok {
+		return fmt.Errorf("run: unsupported database scheme in DSN: %s", cfg.dbDSN)
+	}
+
+	reg, err := setFunc(registry.Config(cfg.dbDSN))
+	if err != nil {
+		return fmt.Errorf("run: connect to database: %w", err)
+	}
 
 	srv := &http.Server{
 		Addr:              cfg.addr,
-		Handler:           mux,
+		Handler:           apiserver.New(reg),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
@@ -69,9 +79,4 @@ func runServer(cfg *config) error {
 	}
 
 	return srv.Close()
-}
-
-func healthzHandler(w http.ResponseWriter, _ *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	_, _ = fmt.Fprintln(w, "ok")
 }

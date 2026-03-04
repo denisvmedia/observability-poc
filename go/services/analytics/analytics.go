@@ -27,26 +27,26 @@ const (
 
 // Alert describes a quality issue detected for a specific version.
 type Alert struct {
-	Code    AlertCode
-	Message string
+	Code    AlertCode `json:"code"`
+	Message string    `json:"message"`
 }
 
 // KPIDimension holds the per-dimension comparison result between two versions.
 type KPIDimension struct {
-	Name        string
-	VersionA    float64
-	VersionB    float64
-	Winner      string // "A", "B", or "tie"
-	LowerBetter bool
+	Name        string  `json:"name"`
+	VersionA    float64 `json:"version_a"`
+	VersionB    float64 `json:"version_b"`
+	Winner      string  `json:"winner"` // "A", "B", or "tie"
+	LowerBetter bool    `json:"lower_better"`
 }
 
 // Recommendation is the overall comparison result between two versions.
 type Recommendation struct {
-	Winner     string // version string of the winner, or "" if tie
-	WinsA      int
-	WinsB      int
-	Dimensions []KPIDimension
-	Reason     string
+	Winner     string         `json:"winner"` // version string of the winner, or "" if tie
+	WinsA      int            `json:"wins_a"`
+	WinsB      int            `json:"wins_b"`
+	Dimensions []KPIDimension `json:"dimensions"`
+	Reason     string         `json:"reason"`
 }
 
 const minSampleSize = 100
