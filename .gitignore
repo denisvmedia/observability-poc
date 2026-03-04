@@ -83,6 +83,10 @@ coverage.html
 
 # Project specific
 /.research/
+*.xlsx
+*.xls
 
 # E2E test Docker artifacts (built locally, not committed)
 .tmp_*
+.docker/clickhouse
+*.xlsx

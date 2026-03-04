@@ -123,6 +123,21 @@ func TestIngest_UnparseableFloat_Skipped(t *testing.T) {
 	c.Assert(result.Errors, qt.HasLen, 1)
 }
 
+func TestIngest_TimestampWithMicrosecondsAndTZ(t *testing.T) {
+	c := qt.New(t)
+
+	// Format from real dataset: "2026-02-22 19:04:30.015208-05:00"
+	row := []string{"2026-02-22 19:04:30.015208-05:00", "u1", "1.0", "p", "chrome", "1", "1", "1", "0.01", "0.02", "0.03", "1.5"}
+	reg := &mockRegistry{}
+	result, err := ingestion.Ingest(context.Background(), makeXLSX([][]string{defaultHeaders, row}), reg)
+
+	c.Assert(err, qt.IsNil)
+	c.Assert(result.RowsInserted, qt.Equals, 1)
+	c.Assert(result.RowsSkipped, qt.Equals, 0)
+	// stored as UTC: 19:04:30 -05:00 = 00:04:30 UTC next day
+	c.Assert(reg.batches[0][0].Timestamp.UTC().Hour(), qt.Equals, 0)
+}
+
 func TestIngest_EmptyTimestamp_Skipped(t *testing.T) {
 	c := qt.New(t)
 

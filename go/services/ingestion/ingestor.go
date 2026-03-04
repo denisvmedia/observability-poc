@@ -199,9 +199,14 @@ func parseTimestamp(s string) (time.Time, error) {
 	if s == "" {
 		return time.Time{}, fmt.Errorf("empty timestamp")
 	}
-	for _, layout := range []string{"2006-01-02 15:04:05", "2006-01-02"} {
+	for _, layout := range []string{
+		"2006-01-02 15:04:05.999999999-07:00", // with microseconds + tz offset
+		"2006-01-02 15:04:05.999999999Z07:00", // with microseconds + Z
+		"2006-01-02 15:04:05",                 // plain datetime
+		"2006-01-02",                          // date only
+	} {
 		if t, err := time.Parse(layout, s); err == nil {
-			return t, nil
+			return t.UTC(), nil
 		}
 	}
 	return time.Time{}, fmt.Errorf("unrecognised timestamp format: %q", s)
