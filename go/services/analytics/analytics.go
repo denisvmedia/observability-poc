@@ -88,37 +88,50 @@ func ComputeRecommendation(a, b models.VersionKPIs) Recommendation {
 		rec.Dimensions = append(rec.Dimensions, kd)
 	}
 
-	total := len(dims)
+	// contested is the number of metrics where the two versions actually differ.
+	// Tied metrics don't contribute to the winner decision and are excluded from
+	// the denominator so the reason message reflects only meaningful comparisons.
+	contested := rec.WinsA + rec.WinsB
 	switch {
 	case rec.WinsA > rec.WinsB:
 		rec.Winner = a.Version
-		rec.Reason = fmt.Sprintf("Version %s wins on %d/%d metrics", a.Version, rec.WinsA, total)
+		rec.Reason = fmt.Sprintf("Version %s wins on %d/%d metrics", a.Version, rec.WinsA, contested)
 	case rec.WinsB > rec.WinsA:
 		rec.Winner = b.Version
-		rec.Reason = fmt.Sprintf("Version %s wins on %d/%d metrics", b.Version, rec.WinsB, total)
+		rec.Reason = fmt.Sprintf("Version %s wins on %d/%d metrics", b.Version, rec.WinsB, contested)
 	default:
 		rec.Winner = ""
-		rec.Reason = fmt.Sprintf("Tie (%d/%d each)", rec.WinsA, total)
+		if contested == 0 {
+			rec.Reason = "All metrics are equal"
+		} else {
+			rec.Reason = fmt.Sprintf("Tie (%d/%d each)", rec.WinsA, contested)
+		}
 	}
 
 	return rec
 }
 
-// floatEpsilon is the tolerance used when comparing aggregated float64 KPI values.
-// Values this close are treated as equal (a tie) rather than risking a spurious winner
-// due to floating-point rounding in ClickHouse aggregations.
-const floatEpsilon = 1e-9
+// displayPrecision is the number of decimal places shown in the UI.
+// Comparisons are performed at this precision so that the winner decision
+// always matches what the user actually sees on screen.
+const displayPrecision = 1e4 // 4 decimal places → multiply by 10^4
+
+// round4 rounds v to 4 decimal places, matching the frontend's toFixed(4).
+func round4(v float64) float64 {
+	return math.Round(v*displayPrecision) / displayPrecision
+}
 
 func dimensionWinner(valA, valB float64, lowerBetter bool) string {
-	if math.Abs(valA-valB) < floatEpsilon {
+	a, b := round4(valA), round4(valB)
+	if a == b {
 		return "tie"
 	}
 	switch {
-	case lowerBetter && valA < valB:
+	case lowerBetter && a < b:
 		return "A"
-	case lowerBetter && valA > valB:
+	case lowerBetter && a > b:
 		return "B"
-	case !lowerBetter && valA > valB:
+	case !lowerBetter && a > b:
 		return "A"
 	default:
 		return "B"
