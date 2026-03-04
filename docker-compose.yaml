@@ -1,0 +1,55 @@
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:25
+    restart: unless-stopped
+    environment:
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-observability}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-observability}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-observability_password}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    volumes:
+      - ./.docker/clickhouse:/var/lib/clickhouse
+    ports:
+      - "${CLICKHOUSE_HTTP_PORT:-8123}:8123"
+      - "${CLICKHOUSE_NATIVE_PORT:-9000}:9000"
+    networks:
+      - obs-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8123/ping || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 30s
+
+  observability:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    restart: unless-stopped
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    environment:
+      OBSERVABILITY_ADDR: ":8080"
+      OBSERVABILITY_DB_DSN: "clickhouse://${CLICKHOUSE_USER:-observability}:${CLICKHOUSE_PASSWORD:-observability_password}@clickhouse:9000/${CLICKHOUSE_DB:-observability}"
+      LOG_FORMAT: json
+      TZ: ${TZ:-UTC}
+    ports:
+      - "${OBSERVABILITY_PORT:-8080}:8080"
+    networks:
+      - obs-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  obs-network:
+    driver: bridge
+
+volumes:
+  clickhouse-data:
+
