@@ -17,7 +17,7 @@ A small quality-of-experience dashboard for comparing playback session metrics a
 ```
 docker run -p 8080:8080 \
   -e OBSERVABILITY_DB_DSN="clickhouse://user:password@host:9000/dbname" \
-  ghcr.io/denisvmedia/observability-poc:latest run
+  ghcr.io/denisvmedia/observability-poc:latest
 ```
 
 Or with Docker Compose using the pre-built image, set `image: ghcr.io/denisvmedia/observability-poc:latest` instead of the `build` block in `docker-compose.yaml`.
