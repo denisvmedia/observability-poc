@@ -1,6 +1,7 @@
 package run
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -57,6 +58,14 @@ func runServer(cfg *config) error {
 	reg, err := setFunc(registry.Config(cfg.dbDSN))
 	if err != nil {
 		return fmt.Errorf("run: connect to database: %w", err)
+	}
+
+	if m, ok := reg.(registry.Migrator); ok {
+		slog.Info("Running database migrations")
+		if err = m.Migrate(context.Background()); err != nil {
+			return fmt.Errorf("run: migrate database: %w", err)
+		}
+		slog.Info("Database migrations complete")
 	}
 
 	srv := &http.Server{

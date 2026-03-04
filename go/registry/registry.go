@@ -20,6 +20,13 @@ type SessionRegistry interface {
 	GetKPIs(ctx context.Context, versions []string) ([]models.VersionKPIs, error)
 }
 
+// Migrator is an optional interface that registry backends may implement.
+// If implemented, Migrate is called once during application startup to
+// ensure the required schema exists before serving requests.
+type Migrator interface {
+	Migrate(ctx context.Context) error
+}
+
 // Config is the raw DSN string used to connect to the database.
 type Config string
 

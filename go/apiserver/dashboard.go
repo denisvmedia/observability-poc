@@ -2,6 +2,7 @@ package apiserver
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 
 	"github.com/denisvmedia/observability-poc/models"
@@ -42,6 +43,7 @@ func dashboardHandler(reg registry.SessionRegistry) http.HandlerFunc {
 
 		kpis, err := reg.GetKPIs(r.Context(), []string{v1, v2})
 		if err != nil {
+			slog.Error("failed to fetch KPIs", "error", err)
 			http.Error(w, `{"error":"failed to fetch KPIs"}`, http.StatusInternalServerError)
 			return
 		}
