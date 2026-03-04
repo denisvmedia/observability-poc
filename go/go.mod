@@ -3,6 +3,8 @@ module github.com/denisvmedia/observability-poc
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.43.0
 	github.com/denisvmedia/observability-poc/frontend v0.0.0
+	github.com/frankban/quicktest v1.14.6
+	github.com/go-chi/chi/v5 v5.2.5
 	github.com/spf13/cobra v1.10.2
 	github.com/xuri/excelize/v2 v2.10.1
 )
@@ -11,8 +13,6 @@ require (
 	github.com/ClickHouse/ch-go v0.71.0 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/frankban/quicktest v1.14.6 // indirect
-	github.com/go-chi/chi/v5 v5.2.5 // indirect
 	github.com/go-faster/city v1.0.1 // indirect
 	github.com/go-faster/errors v0.7.1 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
