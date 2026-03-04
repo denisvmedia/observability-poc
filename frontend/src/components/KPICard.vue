@@ -39,7 +39,7 @@ withDefaults(
 )
 
 function formatted(v: number): string {
-  return v.toFixed(3)
+  return v.toFixed(4)
 }
 </script>
 

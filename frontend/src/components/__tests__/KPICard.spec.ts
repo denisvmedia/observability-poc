@@ -3,12 +3,12 @@ import { mount } from '@vue/test-utils'
 import KPICard from '@/components/KPICard.vue'
 
 describe('KPICard', () => {
-  it('renders version A and B values', () => {
+  it('renders version A and B values with 4 decimal places', () => {
     const wrapper = mount(KPICard, {
-      props: { name: 'VSF Rate', valueA: 0.012, valueB: 0.034, winner: 'A' },
+      props: { name: 'VSF Rate', valueA: 0.0037, valueB: 0.0070, winner: 'A' },
     })
-    expect(wrapper.text()).toContain('0.012')
-    expect(wrapper.text()).toContain('0.034')
+    expect(wrapper.text()).toContain('0.0037')
+    expect(wrapper.text()).toContain('0.0070')
     expect(wrapper.text()).toContain('VSF Rate')
   })
 
@@ -45,7 +45,7 @@ describe('KPICard', () => {
     const wrapper = mount(KPICard, {
       props: { name: 'Avg VST', valueA: 1.5, valueB: 2.0, winner: 'A', unit: 's' },
     })
-    expect(wrapper.text()).toContain('1.500s')
+    expect(wrapper.text()).toContain('1.5000s')
   })
 })
 

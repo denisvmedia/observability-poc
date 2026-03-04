@@ -66,6 +66,7 @@ onMounted(() => {
 const canCompare = computed(
   () => store.selectedV1 && store.selectedV2 && store.selectedV1 !== store.selectedV2,
 )
+
 </script>
 
 <style lang="scss" scoped>
