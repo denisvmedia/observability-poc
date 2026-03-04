@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/denisvmedia/observability-poc/cmd/observability/run"
+	"github.com/denisvmedia/observability-poc/cmd/observability/version"
 )
 
 func newRootCmd() *cobra.Command {
@@ -12,6 +13,7 @@ func newRootCmd() *cobra.Command {
 		Short: "Observability POC server",
 	}
 	cmd.AddCommand(run.New())
+	cmd.AddCommand(version.New())
 
 	return cmd
 }
