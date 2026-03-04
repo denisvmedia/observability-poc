@@ -4,18 +4,18 @@ import "time"
 
 // PlaybackSession represents a single playback event row stored in ClickHouse.
 type PlaybackSession struct {
-	Timestamp     time.Time
-	UUID          string
-	AppVersion    string
-	PlayerVersion string
-	PlayerName    string
-	Attempts      uint8
-	Plays         uint8
-	EndedPlays    uint8
-	VSF           float64
-	VPF           float64
-	CIRR          float64
-	VST           float64
+	Timestamp     time.Time `ch:"timestamp"`
+	UUID          string    `ch:"uuid"`
+	AppVersion    string    `ch:"app_version"`
+	PlayerVersion string    `ch:"player_version"`
+	PlayerName    string    `ch:"player_name"`
+	Attempts      uint8     `ch:"attempts"`
+	Plays         uint8     `ch:"plays"`
+	EndedPlays    uint8     `ch:"ended_plays"`
+	VSF           float64   `ch:"vsf"`
+	VPF           float64   `ch:"vpf"`
+	CIRR          float64   `ch:"cirr"`
+	VST           float64   `ch:"vst"`
 }
 
 // VersionKPIs holds aggregated quality metrics for a single app version.
