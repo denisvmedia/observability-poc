@@ -9,6 +9,7 @@ services:
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
     volumes:
       - ./.docker/clickhouse:/var/lib/clickhouse
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
       - "${CLICKHOUSE_HTTP_PORT:-8123}:8123"
       - "${CLICKHOUSE_NATIVE_PORT:-9000}:9000"
@@ -21,27 +22,6 @@ services:
       retries: 20
       start_period: 30s
 
-  init-schema:
-    image: clickhouse/clickhouse-server:latest
-    depends_on:
-      clickhouse:
-        condition: service_healthy
-    volumes:
-      - ./db/init.sql:/init.sql:ro
-    entrypoint: /bin/sh
-    command:
-      - "-c"
-      - >
-        clickhouse-client
-        --host clickhouse
-        --user ${CLICKHOUSE_USER:-observability}
-        --password ${CLICKHOUSE_PASSWORD:-observability_password}
-        --database ${CLICKHOUSE_DB:-observability}
-        --queries-file /init.sql
-    restart: "no"
-    networks:
-      - obs-network
-
   observability:
     build:
       context: .
@@ -51,8 +31,6 @@ services:
     depends_on:
       clickhouse:
         condition: service_healthy
-      init-schema:
-        condition: service_completed_successfully
     environment:
       OBSERVABILITY_ADDR: ":8080"
       OBSERVABILITY_DB_DSN: "clickhouse://${CLICKHOUSE_USER:-observability}:${CLICKHOUSE_PASSWORD:-observability_password}@clickhouse:9000/${CLICKHOUSE_DB:-observability}"

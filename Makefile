@@ -36,7 +36,7 @@ help:
 	@echo ""
 	@echo "Run:"
 	@echo "  run               build-nofe, then start the server (requires local ClickHouse)"
-	@echo "  run-clickhouse    Start ClickHouse via Docker, init schema, then start the server"
+	@echo "  run-clickhouse    Start ClickHouse via Docker (schema auto-inits), then start the server"
 	@echo ""
 	@echo "Test:"
 	@echo "  test              Run all tests (Go + frontend)"
@@ -140,7 +140,7 @@ run: build-nofe
 # Start ClickHouse + run schema init via Docker, then run the binary pointing at it.
 .PHONY: run-clickhouse
 run-clickhouse: build-nofe
-	docker compose up -d clickhouse init-schema
+	docker compose up -d clickhouse
 	OBSERVABILITY_DB_DSN="clickhouse://observability:observability_password@localhost:9000/observability" \
 	  ./$(BINARY_PATH) run
 
