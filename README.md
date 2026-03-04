@@ -35,6 +35,52 @@ attempts, plays, ended_plays, vsf, vpf, cirr, vst
 
 Timestamps can include timezone offset and microseconds (`2026-02-22 19:04:30.015208-05:00`). Floats can use either `.` or `,` as decimal separator.
 
+## KPIs and scoring
+
+Six metrics are computed per version from the raw session rows:
+
+| Metric | Formula | Direction |
+|---|---|---|
+| VSF Rate | `sum(vsf where attempts=1) / count(attempts=1)` | lower is better |
+| VPF Rate | `sum(vpf where plays=1) / count(plays=1)` | lower is better |
+| CIRR | `sum(cirr where plays=1) / count(plays=1)` | lower is better |
+| Avg VST | `avg(vst where attempts=1)` | lower is better |
+| Play Rate | `sum(plays where attempts=1) / count(attempts=1)` | higher is better |
+| Completion Rate | `sum(ended_plays where plays=1) / count(plays=1)` | higher is better |
+
+**Winner selection:** each metric is scored independently. The version that wins more dimensions (out of 6) is declared the overall winner. Ties are possible.
+
+**Alerts** fire when a version crosses these thresholds:
+
+- VSF Rate > 5%
+- VPF Rate > 5%
+- CIRR > 10%
+- Avg VST > 5s
+- Session count < 100 (low statistical confidence)
+- Session count = 0 (no data)
+
+## Troubleshooting
+
+**macOS: "cannot be opened because the developer cannot be verified"**
+
+Binaries built locally are unsigned, so Gatekeeper blocks them. To remove the quarantine flag:
+
+```
+xattr -d com.apple.quarantine ./bin/observability
+```
+
+If that doesn't help (e.g. the attribute isn't there but it still won't run):
+
+```
+sudo spctl --master-disable
+./bin/observability run
+sudo spctl --master-enable
+```
+
+Or right-click the binary in Finder → Open → Open anyway.
+
+More details: https://donatstudios.com/mac-terminal-run-unsigned-binaries
+
 ## Development
 
 ```

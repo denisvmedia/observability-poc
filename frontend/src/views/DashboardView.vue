@@ -25,6 +25,11 @@
     <template v-if="store.dashboard">
       <RecommendationBadge :recommendation="store.dashboard.recommendation" />
 
+      <RadarChart
+        :version-a="store.dashboard.versions.a"
+        :version-b="store.dashboard.versions.b"
+      />
+
       <div class="dashboard-view__alerts">
         <AlertBanner :alerts="store.dashboard.alerts.a" :version-label="`Version A: ${store.selectedV1}`" />
         <AlertBanner :alerts="store.dashboard.alerts.b" :version-label="`Version B: ${store.selectedV2}`" />
@@ -50,6 +55,7 @@ import { useDashboardStore } from '@/stores/dashboard'
 import KPICard from '@/components/KPICard.vue'
 import AlertBanner from '@/components/AlertBanner.vue'
 import RecommendationBadge from '@/components/RecommendationBadge.vue'
+import RadarChart from '@/components/RadarChart.vue'
 
 const store = useDashboardStore()
 

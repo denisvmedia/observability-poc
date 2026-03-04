@@ -20,10 +20,12 @@
   "dependencies": {
     "@primeuix/themes": "^2.0.3",
     "axios": "^1.13.6",
+    "chart.js": "^4.5.1",
     "pinia": "3.0.4",
     "primeicons": "^7.0.0",
     "primevue": "4.5.4",
     "vue": "3.5.29",
+    "vue-chartjs": "^5.3.3",
     "vue-router": "5.0.3"
   },
   "devDependencies": {
@@ -34,7 +36,7 @@
     "@vitest/coverage-v8": "4.0.18",
     "@vue/eslint-config-typescript": "14.7.0",
     "@vue/test-utils": "2.4.6",
-    "@vue/tsconfig": "0.8.1",
+    "@vue/tsconfig": "0.9.0",
     "eslint": "10.0.2",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-vue": "10.8.0",
