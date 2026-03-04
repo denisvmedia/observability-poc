@@ -23,6 +23,40 @@ BINARY_PATH=$(BIN_DIR)/$(BINARY_NAME)
 .PHONY: all
 all: build
 
+# Help
+.PHONY: help
+help:
+	@echo "Usage: make <target>"
+	@echo ""
+	@echo "Build:"
+	@echo "  build             Build frontend + backend with embedded frontend (with_frontend tag)"
+	@echo "  build-backend     Build backend only (requires dist/ from build-frontend)"
+	@echo "  build-nofe        Build backend without frontend embed (faster, for development)"
+	@echo "  build-frontend    Build frontend with Vite (output: frontend/dist/)"
+	@echo ""
+	@echo "Run:"
+	@echo "  run               build-nofe, then start the server (requires local ClickHouse)"
+	@echo "  run-clickhouse    Start ClickHouse via Docker, init schema, then start the server"
+	@echo ""
+	@echo "Test:"
+	@echo "  test              Run all tests (Go + frontend)"
+	@echo "  test-go           Run Go unit tests"
+	@echo "  test-frontend     Run Vitest unit tests"
+	@echo ""
+	@echo "Lint:"
+	@echo "  lint              Run all linters (Go + frontend)"
+	@echo "  lint-go           Run nolintguard → qtlint → golangci-lint"
+	@echo "  lint-go-fix       Run go fix → qtlint -fix → golangci-lint --fix"
+	@echo "  lint-frontend     Run eslint + stylelint"
+	@echo ""
+	@echo "Docker:"
+	@echo "  docker-build      Build the production Docker image"
+	@echo "  docker-up         Start the full stack with docker compose"
+	@echo "  docker-down       Stop and remove the docker compose stack"
+	@echo ""
+	@echo "Misc:"
+	@echo "  clean             Remove bin/ and frontend/dist/"
+
 # Build everything (frontend + backend with embed)
 .PHONY: build
 build: build-frontend build-backend
