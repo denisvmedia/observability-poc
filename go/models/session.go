@@ -21,7 +21,7 @@ type PlaybackSession struct {
 // VersionKPIs holds aggregated quality metrics for a single app version.
 type VersionKPIs struct {
 	Version        string  `json:"version"`
-	SessionCount   int64   `json:"session_count"`
+	SessionCount   uint64  `json:"session_count"`
 	VSFRate        float64 `json:"vsf_rate"`
 	VPFRate        float64 `json:"vpf_rate"`
 	CIRRRate       float64 `json:"cirr_rate"`

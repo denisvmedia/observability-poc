@@ -62,7 +62,7 @@ func (m *mockRegistry) GetKPIs(_ context.Context, versions []string) ([]models.V
 	if m.err != nil {
 		return nil, m.err
 	}
-	counts := make(map[string]int64)
+	counts := make(map[string]uint64)
 	for _, s := range m.sessions {
 		counts[s.AppVersion]++
 	}
