@@ -13,7 +13,7 @@ func versionsHandler(reg registry.SessionRegistry) http.HandlerFunc {
 		versions, err := reg.ListVersions(r.Context())
 		if err != nil {
 			slog.Error("failed to list versions", "error", err)
-			http.Error(w, `{"error":"failed to list versions"}`, http.StatusInternalServerError)
+			writeJSONError(w, http.StatusInternalServerError, "failed to list versions")
 			return
 		}
 

@@ -32,19 +32,19 @@ func dashboardHandler(reg registry.SessionRegistry) http.HandlerFunc {
 		v2 := r.URL.Query().Get("v2")
 
 		if v1 == "" || v2 == "" {
-			http.Error(w, `{"error":"v1 and v2 query parameters are required"}`, http.StatusBadRequest)
+			writeJSONError(w, http.StatusBadRequest, "v1 and v2 query parameters are required")
 			return
 		}
 
 		if v1 == v2 {
-			http.Error(w, `{"error":"v1 and v2 must be different versions"}`, http.StatusBadRequest)
+			writeJSONError(w, http.StatusBadRequest, "v1 and v2 must be different versions")
 			return
 		}
 
 		kpis, err := reg.GetKPIs(r.Context(), []string{v1, v2})
 		if err != nil {
 			slog.Error("failed to fetch KPIs", "error", err)
-			http.Error(w, `{"error":"failed to fetch KPIs"}`, http.StatusInternalServerError)
+			writeJSONError(w, http.StatusInternalServerError, "failed to fetch KPIs")
 			return
 		}
 

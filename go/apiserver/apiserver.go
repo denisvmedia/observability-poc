@@ -2,6 +2,7 @@
 package apiserver
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -36,4 +37,15 @@ func New(reg registry.SessionRegistry) http.Handler {
 func healthzHandler(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, _ = fmt.Fprintln(w, "ok")
+}
+
+// writeJSONError writes a JSON-encoded {"error": msg} response.
+// Using json.NewEncoder ensures msg is properly escaped, avoiding any risk
+// of malformed JSON from special characters in error strings.
+func writeJSONError(w http.ResponseWriter, status int, msg string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	_ = json.NewEncoder(w).Encode(struct {
+		Error string `json:"error"`
+	}{Error: msg})
 }

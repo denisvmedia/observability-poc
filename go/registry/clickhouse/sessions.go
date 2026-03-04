@@ -8,6 +8,9 @@ import (
 )
 
 // InsertBatch inserts a batch of playback sessions into ClickHouse.
+// TODO: no deduplication — uploading the same file twice will double the data.
+// For production consider ReplacingMergeTree (dedup on merge) or a pre-insert
+// EXISTS check keyed on (uuid, timestamp).
 func (r *Registry) InsertBatch(ctx context.Context, sessions []models.PlaybackSession) error {
 	batch, err := r.conn.PrepareBatch(ctx, "INSERT INTO playback_sessions")
 	if err != nil {
@@ -56,13 +59,13 @@ func (r *Registry) GetKPIs(ctx context.Context, versions []string) ([]models.Ver
 	rows, err := r.conn.Query(ctx, `
 		SELECT
 			app_version,
-			count()                                                          AS session_count,
-			sumIf(vsf,  attempts = 1) / countIf(attempts = 1)               AS vsf_rate,
-			sumIf(vpf,  plays = 1)    / countIf(plays = 1)                  AS vpf_rate,
-			sumIf(cirr, plays = 1)    / countIf(plays = 1)                  AS cirr_rate,
-			avgIf(vst,  attempts = 1)                                        AS avg_vst,
-			sumIf(plays,       attempts = 1) / countIf(attempts = 1)        AS play_rate,
-			sumIf(ended_plays, plays = 1)    / countIf(plays = 1)           AS completion_rate
+			count()                                                                                       AS session_count,
+			if(countIf(attempts = 1) > 0, sumIf(vsf,         attempts = 1) / countIf(attempts = 1), 0) AS vsf_rate,
+			if(countIf(plays = 1)    > 0, sumIf(vpf,         plays = 1)    / countIf(plays = 1),    0) AS vpf_rate,
+			if(countIf(plays = 1)    > 0, sumIf(cirr,        plays = 1)    / countIf(plays = 1),    0) AS cirr_rate,
+			if(countIf(attempts = 1) > 0, avgIf(vst,         attempts = 1),                         0) AS avg_vst,
+			if(countIf(attempts = 1) > 0, sumIf(plays,       attempts = 1) / countIf(attempts = 1), 0) AS play_rate,
+			if(countIf(plays = 1)    > 0, sumIf(ended_plays, plays = 1)    / countIf(plays = 1),    0) AS completion_rate
 		FROM playback_sessions
 		WHERE app_version IN (?)
 		GROUP BY app_version

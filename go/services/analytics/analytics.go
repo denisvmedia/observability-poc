@@ -3,6 +3,7 @@ package analytics
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/denisvmedia/observability-poc/models"
 )
@@ -103,10 +104,16 @@ func ComputeRecommendation(a, b models.VersionKPIs) Recommendation {
 	return rec
 }
 
+// floatEpsilon is the tolerance used when comparing aggregated float64 KPI values.
+// Values this close are treated as equal (a tie) rather than risking a spurious winner
+// due to floating-point rounding in ClickHouse aggregations.
+const floatEpsilon = 1e-9
+
 func dimensionWinner(valA, valB float64, lowerBetter bool) string {
-	switch {
-	case valA == valB:
+	if math.Abs(valA-valB) < floatEpsilon {
 		return "tie"
+	}
+	switch {
 	case lowerBetter && valA < valB:
 		return "A"
 	case lowerBetter && valA > valB:

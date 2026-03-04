@@ -19,20 +19,20 @@ type uploadResponse struct {
 func uploadHandler(reg registry.SessionRegistry) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := r.ParseMultipartForm(maxUploadBytes); err != nil {
-			http.Error(w, `{"error":"request too large or not multipart"}`, http.StatusBadRequest)
+			writeJSONError(w, http.StatusBadRequest, "request too large or not multipart")
 			return
 		}
 
 		file, _, err := r.FormFile("file")
 		if err != nil {
-			http.Error(w, `{"error":"missing file field"}`, http.StatusBadRequest)
+			writeJSONError(w, http.StatusBadRequest, "missing file field")
 			return
 		}
 		defer file.Close()
 
 		result, err := ingestion.Ingest(r.Context(), file, reg)
 		if err != nil {
-			http.Error(w, `{"error":"ingestion failed: `+err.Error()+`"}`, http.StatusUnprocessableEntity)
+			writeJSONError(w, http.StatusUnprocessableEntity, "ingestion failed: "+err.Error())
 			return
 		}
 
