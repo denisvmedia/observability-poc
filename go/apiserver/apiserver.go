@@ -19,11 +19,11 @@ func New(reg registry.SessionRegistry) http.Handler {
 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-	r.Use(middleware.SetHeader("Content-Type", "application/json"))
 
 	r.Get("/healthz", healthzHandler)
 
 	r.Route("/api/v1", func(r chi.Router) {
+		r.Use(middleware.SetHeader("Content-Type", "application/json"))
 		r.Post("/upload", uploadHandler(reg))
 		r.Get("/versions", versionsHandler(reg))
 		r.Get("/dashboard", dashboardHandler(reg))
