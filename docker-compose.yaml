@@ -21,6 +21,27 @@ services:
       retries: 20
       start_period: 30s
 
+  init-schema:
+    image: clickhouse/clickhouse-server:25
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    volumes:
+      - ./db/init.sql:/init.sql:ro
+    entrypoint: /bin/sh
+    command:
+      - "-c"
+      - >
+        clickhouse-client
+        --host clickhouse
+        --user ${CLICKHOUSE_USER:-observability}
+        --password ${CLICKHOUSE_PASSWORD:-observability_password}
+        --database ${CLICKHOUSE_DB:-observability}
+        --queries-file /init.sql
+    restart: "no"
+    networks:
+      - obs-network
+
   observability:
     build:
       context: .
@@ -30,6 +51,8 @@ services:
     depends_on:
       clickhouse:
         condition: service_healthy
+      init-schema:
+        condition: service_completed_successfully
     environment:
       OBSERVABILITY_ADDR: ":8080"
       OBSERVABILITY_DB_DSN: "clickhouse://${CLICKHOUSE_USER:-observability}:${CLICKHOUSE_PASSWORD:-observability_password}@clickhouse:9000/${CLICKHOUSE_DB:-observability}"

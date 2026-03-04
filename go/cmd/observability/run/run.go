@@ -15,6 +15,14 @@ import (
 	"github.com/denisvmedia/observability-poc/registry"
 )
 
+func envOrDefault(key, def string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+
+	return def
+}
+
 type config struct {
 	addr  string
 	dbDSN string
@@ -32,8 +40,8 @@ func New() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&cfg.addr, "addr", ":8080", "Bind address for the server")
-	cmd.Flags().StringVar(&cfg.dbDSN, "db-dsn", "clickhouse://localhost:9000/observability", "Database DSN (clickhouse://user:pass@host:port/db)")
+	cmd.Flags().StringVar(&cfg.addr, "addr", envOrDefault("OBSERVABILITY_ADDR", ":8080"), "Bind address for the server (env: OBSERVABILITY_ADDR)")
+	cmd.Flags().StringVar(&cfg.dbDSN, "db-dsn", envOrDefault("OBSERVABILITY_DB_DSN", "clickhouse://localhost:9000/observability"), "Database DSN (env: OBSERVABILITY_DB_DSN)")
 
 	return cmd
 }

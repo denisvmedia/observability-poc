@@ -96,6 +96,20 @@ clean:
 	$(call RM,$(BIN_DIR))
 	$(CD) $(FRONTEND_DIR) && npm run clean
 
+# Run targets
+
+# Build and run the binary with the default ClickHouse DSN (requires local ClickHouse).
+.PHONY: run
+run: build-nofe
+	./$(BINARY_PATH) run
+
+# Start ClickHouse + run schema init via Docker, then run the binary pointing at it.
+.PHONY: run-clickhouse
+run-clickhouse: build-nofe
+	docker compose up -d clickhouse init-schema
+	OBSERVABILITY_DB_DSN="clickhouse://observability:observability_password@localhost:9000/observability" \
+	  ./$(BINARY_PATH) run
+
 # Docker targets
 .PHONY: docker-build
 docker-build:
