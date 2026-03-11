@@ -18,6 +18,7 @@ type uploadResponse struct {
 
 func uploadHandler(reg registry.SessionRegistry) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		r.Body = http.MaxBytesReader(w, r.Body, maxUploadBytes)
 		if err := r.ParseMultipartForm(maxUploadBytes); err != nil {
 			writeJSONError(w, http.StatusBadRequest, "request too large or not multipart")
 			return
