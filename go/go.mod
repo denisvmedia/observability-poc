@@ -1,7 +1,7 @@
 module github.com/denisvmedia/observability-poc
 
 require (
-	github.com/ClickHouse/clickhouse-go/v2 v2.43.0
+	github.com/ClickHouse/clickhouse-go/v2 v2.44.0
 	github.com/denisvmedia/observability-poc/frontend v0.0.0
 	github.com/frankban/quicktest v1.14.6
 	github.com/go-chi/chi/v5 v5.2.5
