@@ -16,7 +16,7 @@ COPY frontend/ ./
 RUN npm run build
 
 # Stage 2: Base Go environment
-FROM golang:1.26.1-alpine AS go-base
+FROM golang:1.26.3-alpine AS go-base
 
 RUN apk add --no-cache \
     git \
