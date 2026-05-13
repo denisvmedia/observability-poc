@@ -2,7 +2,7 @@
 # Multi-stage Dockerfile for observability-poc
 
 # Stage 1: Build frontend
-FROM node:25-alpine AS frontend-builder
+FROM node:26-alpine AS frontend-builder
 
 WORKDIR /app/frontend
 
